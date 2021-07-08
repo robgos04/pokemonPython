@@ -32,11 +32,3 @@ Open Terminal and run
 ```bash
 python3 pokemon.py
 ```
-
-```python
-import requests
-import enquiries
-import os
-import json
-import datetime
-import glob
