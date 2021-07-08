@@ -1,7 +1,0 @@
-#Function Show All Stored Pokemon
-def showallPokemon():
-    f = open("pokemondata.txt", "r")
-    pokemonData = f.read()
-    pokemonData = json.loads(pokemonData)
-    for x in pokemonData:
-        show_pokemon(x)
