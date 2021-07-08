@@ -21,7 +21,6 @@ for root,directories,files in os.walk(path,topdown=False):
         #this is the last modified time
         t = os.stat(os.path.join(root, "pokemondata.txt"))[8]
         filetime = datetime.datetime.fromtimestamp(t) - today
-        print(filetime.days)
 
         #checking if file is more than 7 days old or not, if yes then remove them
         if filetime.days <= -7:
@@ -100,14 +99,14 @@ def showallPokemon():
     
 
 #MAIN MENU
-options = ['1. Save Pokemon', '2. Search Pokemon by name', '3. Display Pokemon Data', '4. Exit']
+options = ['1. Save Pokemon', '2. Search Pokemon by ID/Name', '3. Display All Pokemon Data', '4. Exit']
 choice = enquiries.choose('Choose one of these options: ', options)
 print(choice)
 
 if choice == '1. Save Pokemon':
     input_pokemon = input('Enter name/ID of Pokemon: ')
     save_pokemon(input_pokemon)    
-elif choice == '2. Search Pokemon by name':
+elif choice == '2. Search Pokemon by ID/Name':
     input_pokemon = input('Enter name/ID of Pokemon: ')
     if input_pokemon.isdigit():
         response = requests.get("https://pokeapi.co/api/v2/pokemon/"+input_pokemon)
@@ -126,7 +125,7 @@ elif choice == '2. Search Pokemon by name':
     else:
         save_pokemon(input_pokemon)
         show_pokemon(input_pokemon)
-elif choice == '3. Display Pokemon Data':
+elif choice == '3. Display All Pokemon Data':
     showallPokemon()
 elif choice == '4. Exit':
     exit()
