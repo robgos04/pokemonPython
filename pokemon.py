@@ -4,7 +4,7 @@ import os
 import json
 import datetime
 import glob
-path = '/Users/robertgosal/Documents/python'
+path = '/Users/robertgosal/Documents/pokemonPython'
 
 #check file exist
 def checkfile():
