@@ -11,7 +11,7 @@ All Pokemon data that stored for 7 days, will be removed and it will automatical
 ## Installation
 Using MacOS, install Python3 and Pip3 using Homebrew
 
-Install [Homebrew]
+Open Terminal and install [Homebrew](https://docs.brew.sh/Installation)
 ```bash
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
