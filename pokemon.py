@@ -5,6 +5,7 @@ import json
 import datetime
 import glob
 path = '/Users/robertgosal/Documents/pokemonPython'
+statusResponse = 1
 
 #check file exist
 def checkfile():
@@ -31,63 +32,93 @@ for root,directories,files in os.walk(path,topdown=False):
             newData = pokemonData
             os.remove(os.path.join(root, "pokemondata.txt"))
             for x in newData:
-                save_pokemon(x)
+                save_pokemon(x['name'])
 
 #Function for Save Pokemon locally
 def save_pokemon(input_pokemon):
     response = requests.get("https://pokeapi.co/api/v2/pokemon/"+input_pokemon)
-    namePokemon = str(response.json()['forms'][0]['name'])
-    idPokemon = str(response.json()['id'])
-    locationResponse = requests.get("https://pokeapi.co/api/v2/pokemon/"+str(response.json()['id'])+"/encounters")
-    pokemon = []
-    checkfile()
-    f = open("pokemondata.txt", "r")
-    dataFromFile = f.read()
-    if dataFromFile != '':
-        x = json.loads(dataFromFile)
-        
-        if namePokemon not in x:
-            x[namePokemon] = {"data":response.json(), "location":locationResponse.json()}
-            os.remove("pokemondata.txt")
-            f = open("pokemondata.txt", "a")
-            f.write(json.dumps(x))
-            f.close()
-            print("You save a Pokemon: "+namePokemon)
-        else:
-            print("You already have "+namePokemon)
+    
+    if response.status_code == 404:
+        print("There's no this pokemon")
     else:
-        f = open("pokemondata.txt", "a")
-        data = {"data":response.json(), "location":locationResponse.json()}
-        result = {namePokemon:data}
-        f.write(json.dumps(result))
-        f.close()
-        print("You save a Pokemon: "+namePokemon) 
+        namePokemon = str(response.json()['forms'][0]['name'])
+        idPokemon = str(response.json()['id'])
+        locationResponse = requests.get("https://pokeapi.co/api/v2/pokemon/"+str(response.json()['id'])+"/encounters")
+        checkfile()
+        pokemon = []
+        f = open("pokemondata.txt", "r")
+        dataFromFile = f.read()
+        if dataFromFile != '':
+            x = json.loads(dataFromFile)
+            status = 0
+            checkpokemon = namePokemon
+            use = 'name'
+            if input_pokemon.isdigit():
+                checkpokemon = idPokemon
+                use = 'id'
+            for y in x:
+                pokemon.append(y)
+                if y[use] == checkpokemon:
+                    status = 1
+                    break
+
+            if status == 0:
+                data = {"id":idPokemon, "name":namePokemon, "data":response.json(), "location":locationResponse.json()}
+                pokemon.append(data)
+                os.remove("pokemondata.txt")
+                f = open("pokemondata.txt", "a")
+                f.write(json.dumps(pokemon))
+                f.close()
+                print("You save a Pokemon: "+namePokemon)
+            else:
+                print("You already have "+namePokemon)
+        else:
+            f = open("pokemondata.txt", "a")
+            data = {"id":idPokemon, "name":namePokemon, "data":response.json(), "location":locationResponse.json()}
+            pokemon.append(data)
+            f.write(json.dumps(pokemon))
+            f.close()
+            print("You save a Pokemon: "+namePokemon) 
 
 #Function for show Pokemon data
 def show_pokemon(input_pokemon):
     f = open("pokemondata.txt", "r")
     pokemonData = f.read()
     pokemonData = json.loads(pokemonData)
-    thisPokemon = pokemonData[input_pokemon]['data']
-    print("\nPokemon ID: "+str(thisPokemon['id']))
-    print("Pokemon Name: "+str(thisPokemon['forms'][0]['name']))
-    print("Pokemon Type(s):")
-    for x in thisPokemon['types']:
-        print("- "+str(x['type']['name']))
 
-    print("Pokemon Encounter location(s) and method(s):")
-    statusLocation = 0
-    for x in pokemonData[input_pokemon]['location']:
-        if "kanto" in x['location_area']['name']:
-            statusLocation = 1
-            print("* "+str(x['location_area']['name']))
-    if statusLocation == 0:
-        print("-")
+    status = 0
+    checkPokemon = "false"
+    use = 'name'
+    if input_pokemon.isdigit():
+        use = 'id'
+    for y in pokemonData:
+        if y[use] != input_pokemon:
+            status += 1
+        else:
+            checkPokemon = "true"
+            break
 
-    print("Pokemon stats:")
-    for y in thisPokemon['stats']:
-        print("- "+str(y['stat']['name'])+": "+str(y['base_stat'])) 
-    print("\n")
+    if checkPokemon == "true":
+        thisPokemon = pokemonData[status]['data']
+        print("\nPokemon ID: "+str(thisPokemon['id']))
+        print("Pokemon Name: "+str(thisPokemon['forms'][0]['name']))
+        print("Pokemon Type(s):")
+        for x in thisPokemon['types']:
+            print("- "+str(x['type']['name']))
+
+        print("Pokemon Encounter location(s) and method(s):")
+        statusLocation = 0
+        for x in pokemonData[status]['location']:
+            if "kanto" in x['location_area']['name']:
+                statusLocation = 1
+                print("* "+str(x['location_area']['name']))
+        if statusLocation == 0:
+            print("-")
+
+        print("Pokemon stats:")
+        for y in thisPokemon['stats']:
+            print("- "+str(y['stat']['name'])+": "+str(y['base_stat'])) 
+        print("\n")
 
 #Function Show All Stored Pokemon
 def showallPokemon():
@@ -95,7 +126,7 @@ def showallPokemon():
     pokemonData = f.read()
     pokemonData = json.loads(pokemonData)
     for x in pokemonData:
-        show_pokemon(x)
+        show_pokemon(x['name'])
     
 
 #MAIN MENU
@@ -108,16 +139,22 @@ if choice == '1. Save Pokemon':
     save_pokemon(input_pokemon)    
 elif choice == '2. Search Pokemon by ID/Name':
     input_pokemon = input('Enter name/ID of Pokemon: ')
-    if input_pokemon.isdigit():
-        response = requests.get("https://pokeapi.co/api/v2/pokemon/"+input_pokemon)
-        input_pokemon = str(response.json()['forms'][0]['name'])
     checkfile()
     f = open("pokemondata.txt", "r")
     pokemonData = f.read()
     if pokemonData != '':
         pokemonData = json.loads(pokemonData)
+        
+        status = 0
+        use = 'name'
+        if input_pokemon.isdigit():
+            use = 'id'
+        for y in pokemonData:
+            if y[use] == input_pokemon:
+                status = 1
+                break
 
-        if input_pokemon in pokemonData:
+        if status == 1:
             show_pokemon(input_pokemon)
         else:
             save_pokemon(input_pokemon)
