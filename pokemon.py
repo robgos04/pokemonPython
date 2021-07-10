@@ -3,8 +3,8 @@ import enquiries
 import os
 import json
 import datetime
+#need to change this path into your current working directory path
 path = '/Users/robertgosal/Documents/pokemonPython'
-statusResponse = 1
 
 #check file exist
 def checkfile():
