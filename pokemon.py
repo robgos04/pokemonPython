@@ -3,7 +3,6 @@ import enquiries
 import os
 import json
 import datetime
-import glob
 path = '/Users/robertgosal/Documents/pokemonPython'
 statusResponse = 1
 
@@ -124,9 +123,12 @@ def show_pokemon(input_pokemon):
 def showallPokemon():
     f = open("pokemondata.txt", "r")
     pokemonData = f.read()
-    pokemonData = json.loads(pokemonData)
-    for x in pokemonData:
-        show_pokemon(x['name'])
+    if pokemonData != '':
+        pokemonData = json.loads(pokemonData)
+        for x in pokemonData:
+            show_pokemon(x['name'])
+    else:
+        print('No pokemon in your pokedex')
     
 
 #MAIN MENU

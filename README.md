@@ -32,6 +32,11 @@ pip3 install requests
 ```
 
 ## Usage
+In the code, don't forget to change path to your current working directory
+```bash
+path = {CURRENT WORKING DIRECTORY} 
+```
+
 Open Terminal and run
 ```bash
 python3 pokemon.py
